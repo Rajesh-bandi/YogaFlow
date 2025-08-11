@@ -2,11 +2,26 @@
 
 ## Overview
 
-YogaFlow is a comprehensive web application that provides personalized yoga routines powered by AI recommendations. The platform allows users to take fitness assessments, receive custom yoga routines based on their experience level and goals, and track their progress over time. Built with modern web technologies, it features a React frontend with a clean, wellness-focused design and an Express.js backend with PostgreSQL database integration.
+YogaFlow is a comprehensive web application that provides personalized yoga routines powered by AI recommendations. The platform features stunning 3D character animations and scroll effects that create an immersive yoga experience. Users can take personalized assessments, receive custom yoga routines based on their experience level and goals, and track their progress over time. Built with modern web technologies, it features a React frontend with advanced Framer Motion animations, wellness-focused design, and an Express.js backend with PostgreSQL database integration.
+
+## Recent Major Enhancements (January 2025)
+
+### 3D Character Animations & Scroll Effects
+- **Enhanced Hero Section**: Dynamic 3D yoga pose carousel with floating particles, energy lines, and parallax scrolling
+- **Framer Motion Integration**: Advanced scroll-triggered animations with spring physics and smooth transitions
+- **Interactive Elements**: Hover effects, rotation animations, and breathing meditation animations
+- **Particle Systems**: Floating orbs, energy pulses, and zen flow backgrounds for immersive experience
+
+### Advanced Visual Features
+- **Scroll Animations**: Multiple animation types (fadeInUp, fadeInLeft, scale, rotateIn) with intersection observer
+- **3D CSS Effects**: Perspective transformations, backface visibility, and rotate effects
+- **Dynamic Background Elements**: Animated geometric patterns, flowing particles, and gradient animations
+- **Yoga Character Display**: Rotating yoga pose demonstrations with pose descriptions and AI-powered overlays
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Focus on stunning visual presentations with smooth 3D animations and scroll effects.
 
 ## System Architecture
 
@@ -57,6 +72,11 @@ Preferred communication style: Simple, everyday language.
 - **Drizzle ORM**: Type-safe database operations and query building
 - **Neon Database**: Serverless PostgreSQL hosting
 - **Zod**: Runtime type validation and schema definition
+
+### Animation & Motion
+- **Framer Motion**: Advanced animation library for React with scroll triggers, spring physics, and 3D transforms
+- **Custom CSS Animations**: Keyframe animations for meditation breathing, energy pulses, and zen flow effects
+- **Intersection Observer API**: Scroll-triggered animations with multiple animation types
 
 ### Development Tools
 - **Vite**: Build tool and development server

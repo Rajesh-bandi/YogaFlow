@@ -120,4 +120,98 @@
     transform: translateZ(0);
     will-change: transform;
   }
+  
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  
+  .rotate-y-12 {
+    transform: rotateY(12deg);
+  }
+  
+  .rotate-x-12 {
+    transform: rotateX(12deg);
+  }
+  
+  .translate-z-50 {
+    transform: translateZ(50px);
+  }
+  
+  .yoga-glow {
+    filter: drop-shadow(0 0 20px rgba(116, 123, 234, 0.4));
+  }
+  
+  .energy-pulse {
+    animation: energyPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes energyPulse {
+    0%, 100% { 
+      box-shadow: 0 0 20px rgba(116, 123, 234, 0.3),
+                  0 0 40px rgba(78, 205, 196, 0.2);
+    }
+    50% { 
+      box-shadow: 0 0 30px rgba(116, 123, 234, 0.6),
+                  0 0 60px rgba(78, 205, 196, 0.4);
+    }
+  }
+  
+  .meditation-breathe {
+    animation: meditationBreathe 4s ease-in-out infinite;
+  }
+  
+  @keyframes meditationBreathe {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.05) rotate(1deg); }
+    50% { transform: scale(1.1) rotate(0deg); }
+    75% { transform: scale(1.05) rotate(-1deg); }
+  }
+  
+  .zen-flow {
+    background: linear-gradient(45deg, 
+      rgba(116, 123, 234, 0.1) 0%, 
+      rgba(78, 205, 196, 0.1) 25%,
+      rgba(251, 191, 36, 0.1) 50%,
+      rgba(78, 205, 196, 0.1) 75%,
+      rgba(116, 123, 234, 0.1) 100%);
+    background-size: 400% 400%;
+    animation: zenFlow 8s ease infinite;
+  }
+  
+  @keyframes zenFlow {
+    0%, 100% { background-position: 0% 50%; }
+    25% { background-position: 100% 50%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 100%; }
+  }
+  
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .yoga-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .yoga-card-hover:hover {
+    transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 0 0 1px rgba(116, 123, 234, 0.1),
+                0 0 20px rgba(116, 123, 234, 0.2);
+  }
 }
