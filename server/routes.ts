@@ -62,58 +62,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ML Recommendations route
+  // ML Recommendations route using real yoga dataset
   app.post("/api/recommendations", async (req, res) => {
     try {
-      const { ageGroup, experience, goals, timeAvailable } = req.body;
+      const { mlEngine } = await import("../client/src/lib/ml-recommendations-new");
+      const input = req.body;
       
-      // Simple ML-like algorithm for recommendations
-      const allRoutines = await storage.getRoutines();
-      let recommendations = [...allRoutines];
-
-      // Filter by experience level
-      if (experience === "beginner") {
-        recommendations = recommendations.filter(r => 
-          r.difficulty === "beginner" || r.difficulty === "all levels"
-        );
-      } else if (experience === "intermediate") {
-        recommendations = recommendations.filter(r => 
-          r.difficulty === "intermediate" || r.difficulty === "all levels"
-        );
-      } else if (experience === "advanced") {
-        recommendations = recommendations.filter(r => 
-          r.difficulty === "advanced" || r.difficulty === "intermediate"
-        );
-      }
-
-      // Filter by time availability
-      const timeMap: { [key: string]: number } = {
-        "10-15 min": 15,
-        "15-30 min": 30,
-        "30-45 min": 45,
-        "45+ min": 60
-      };
+      // Generate intelligent recommendations using real yoga dataset
+      const recommendations = mlEngine.generateRecommendations(input);
       
-      const maxTime = timeMap[timeAvailable] || 30;
-      recommendations = recommendations.filter(r => r.duration <= maxTime);
-
-      // Score based on goals
-      recommendations = recommendations.map(routine => {
-        let score = 0;
-        if (goals.includes("flexibility") && routine.category === "morning") score += 2;
-        if (goals.includes("strength") && routine.category === "strength") score += 3;
-        if (goals.includes("stress relief") && routine.category === "evening") score += 2;
-        if (goals.includes("balance") && routine.category === "strength") score += 1;
-        if (goals.includes("meditation") && routine.category === "evening") score += 2;
-        
-        return { ...routine, score };
-      });
-
-      // Sort by score and return top recommendations
-      recommendations.sort((a, b) => (b as any).score - (a as any).score);
-      
-      res.json(recommendations.slice(0, 6));
+      res.json(recommendations);
     } catch (error) {
+      console.error("ML Recommendation error:", error);
       res.status(500).json({ message: "Failed to generate recommendations", error });
     }
   });

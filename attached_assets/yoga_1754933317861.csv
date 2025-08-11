@@ -1,0 +1,73 @@
+difficulty,goal_category,name,sanskrit_name,min_age,max_age,benefits,duration_sec
+beginner,Mindfulness,Mountain Pose,Tadasana,10,80,"Improves focus, grounding, posture",30
+beginner,Mindfulness,Child’s Pose,Balasana,8,85,"Calms mind, reduces anxiety",45
+beginner,Mindfulness,Seated Meditation,Sukhasana,10,90,"Enhances breath awareness",60
+beginner,Mindfulness,Corpse Pose,Savasana,12,95,"Deep relaxation, stress relief",180
+beginner,Weight Loss,Sun Salutations,Surya Namaskar,12,70,"Full-body warm-up, burns calories",300
+beginner,Weight Loss,Standing Forward Fold,Uttanasana,14,75,"Stretches hamstrings, mild cardio",30
+beginner,Weight Loss,Plank Pose,Phalakasana,15,65,"Core engagement, fat burning",30
+beginner,Weight Loss,Chair Pose,Utkatasana,16,60,"Leg strength, calorie burner",40
+beginner,Posture,Cat-Cow,Marjaryasana-Bitilasana,12,80,"Spinal flexibility, relieves back pain",60
+beginner,Posture,Bridge Pose,Setu Bandhasana,18,75,"Strengthens spine, opens chest",30
+beginner,Posture,Thread the Needle,Parsva Balasana,15,70,"Shoulder/upper back relief",45
+beginner,Posture,Legs-Up-the-Wall,Viparita Karani,12,85,"Spinal decompression",300
+beginner,Stress Relief,Happy Baby,Ananda Balasana,8,90,"Releases hip tension, calming",45
+beginner,Stress Relief,Reclining Twist,Supta Matsyendrasana,16,80,"Relaxes spine, aids digestion",60
+beginner,Stress Relief,Supported Fish,Matsyasana,18,75,"Opens heart, reduces fatigue",120
+beginner,Stress Relief,Bumblebee Breath,Bhramari Pranayama,10,100,"Instant stress relief",180
+beginner,Strength,Warrior I,Virabhadrasana I,16,65,"Builds leg/core strength",40
+beginner,Strength,Warrior II,Virabhadrasana II,16,65,"Hip strength, stamina",45
+beginner,Strength,Plank,Phalakasana,15,60,"Core/arm/shoulder strength",30
+beginner,Strength,Downward Dog,Adho Mukha Svanasana,14,70,"Arm/leg strength",45
+beginner,Flexibility,Seated Forward Bend,Paschimottanasana,16,75,"Hamstring/spine stretch",45
+beginner,Flexibility,Bound Angle,Baddha Konasana,12,80,"Hip/groin opener",60
+beginner,Flexility,Reclining Hand-to-Toe,Supta Padangusthasana,18,70,"Hamstring stretch",45
+beginner,Flexibility,Puppy Pose,Uttana Shishosana,15,75,"Shoulder/back stretch",60
+intermediate,Mindfulness,Tree Pose,Vrksasana,12,75,"Balance, concentration",30
+intermediate,Mindfulness,Eagle Pose,Garudasana,16,70,"Focus, joint mobility",45
+intermediate,Mindfulness,Half Lotus,Ardha Padmasana,18,80,"Hip opener, meditation prep",60
+intermediate,Mindfulness,Alternate Nostril Breathing,Nadi Shodhana,10,100,"Balances nervous system",180
+intermediate,Weight Loss,Warrior III,Virabhadrasana III,16,65,"Full-body toning",30
+intermediate,Weight Loss,Side Plank,Vasisthasana,18,60,"Oblique/core strength",30
+intermediate,Weight Loss,Boat Pose,Navasana,15,70,"Core fat burning",45
+intermediate,Weight Loss,Crescent Lunge,Anjaneyasana,16,65,"Leg/glute activation",40
+intermediate,Posture,Cobra Pose,Bhujangasana,14,75,"Spinal extension",30
+intermediate,Posture,Locust Pose,Salabhasana,16,70,"Back strength",45
+intermediate,Posture,Sphinx Pose,Salamba Bhujangasana,18,80,"Gentle backbend",60
+intermediate,Posture,Reverse Tabletop,Ardha Purvottanasana,16,75,"Shoulder/chest opener",30
+intermediate,Stress Relief,Pigeon Pose,Eka Pada Rajakapotasana,18,70,"Hip release, tension relief",60
+intermediate,Stress Relief,Supported Bridge,Setu Bandha Sarvangasana,16,80,"Calms nervous system",120
+intermediate,Stress Relief,Legs-Up-the-Wall,Viparita Karani,12,90,"Drains lymphatic system",300
+intermediate,Stress Relief,Seated Forward Bend,Paschimottanasana,16,85,"Calms brain",45
+intermediate,Strength,Dolphin Plank,Catur Svanasana,18,65,"Arm/shoulder builder",30
+intermediate,Strength,Reverse Warrior,Viparita Virabhadrasana,16,70,"Side body strength",45
+intermediate,Strength,Gate Pose,Parighasana,18,75,"Core/lateral strength",30
+intermediate,Strength,High Lunge,Utthita Ashwa Sanchalanasana,16,65,"Leg/glute strength",40
+intermediate,Flexibility,King Pigeon,Raja Kapotasana,18,70,"Deep hip opener",60
+intermediate,Flexibility,Fire Log,Agnistambhasana,16,80,"Outer hip stretch",45
+intermediate,Flexibility,Seated Straddle,Upavistha Konasana,14,85,"Inner thigh stretch",60
+intermediate,Flexibility,Camel Pose,Ustrasana,18,75,"Front body opener",30
+advanced,Mindfulness,Headstand,Sirsasana,20,60,"Improves focus, circulation",60
+advanced,Mindfulness,Lotus Pose,Padmasana,18,80,"Deep meditation",180
+advanced,Mindfulness,Handstand,Adho Mukha Vrksasana,18,55,"Balance, concentration",30
+advanced,Mindfulness,Meditative Arm Balance,Bakasana,20,60,"Focus under pressure",20
+advanced,Weight Loss,Power Yoga Flow,Vinyasa,18,65,"High-calorie burn",600
+advanced,Weight Loss,Jumping Crow,Eka Pada Bakasana,20,60,"Explosive strength",15
+advanced,Weight Loss,One-Legged Wheel,Eka Pada Urdhva Dhanurasana,18,55,"Full-body engagement",30
+advanced,Weight Loss,Flying Pigeon,Eka Pada Galavasana,20,60,"Dynamic strength",20
+advanced,Posture,Scorpion Pose,Vrschikasana,20,55,"Advanced backbend",30
+advanced,Posture,King Cobra,Raja Bhujangasana,18,60,"Spinal extension",45
+advanced,Posture,Standing Wheel,Tiryam Mukha Eka Pada Urdhva Dhanurasana,20,50,"Full-body alignment",30
+advanced,Posture,Forearm Stand,Pincha Mayurasana,18,55,"Shoulder/core strength",45
+advanced,Stress Relief,Supported Shoulderstand,Salamba Sarvangasana,18,70,"Calms nervous system",120
+advanced,Stress Relief,Plow Pose,Halasana,18,65,"Neck/shoulder release",60
+advanced,Stress Relief,Reclining Hero,Supta Virasana,16,75,"Quad stretch, relaxation",45
+advanced,Stress Relief,Mermaid Pose,Eka Pada Rajakapotasana,18,70,"Hip/heart opener",60
+advanced,Strength,Peacock Pose,Mayurasana,20,60,"Arm/core strength",30
+advanced,Strength,Eight-Angle Pose,Astavakrasana,20,55,"Full-body engagement",20
+advanced,Strength,One-Legged Crow,Eka Pada Bakasana,18,60,"Arm balance",15
+advanced,Strength,Tortoise Pose,Kurmasana,18,70,"Core/hip strength",45
+advanced,Flexibility,Monkey Pose,Hanumanasana,18,65,"Full split",60
+advanced,Flexibility,King Dancer,Natarajasana,16,70,"Quad/shoulder stretch",45
+advanced,Flexibility,Upward Bow,Wheel Pose (Urdhva Dhanurasana),18,60,"Spine flexibility",30
+advanced,Flexibility,Firefly Pose,Tittibhasana,20,55,"Hamstring/arm flexibility",20

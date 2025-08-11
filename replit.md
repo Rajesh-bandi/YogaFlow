@@ -24,6 +24,12 @@ YogaFlow is a comprehensive web application that provides personalized yoga rout
 - **Dynamic Navigation**: Seamless transitions between pose library, detailed instructions, and practice sessions
 - **Progress Tracking**: Visual progress indicators and session completion celebrations
 
+### Real ML-Powered Recommendations (January 2025)
+- **Authentic Yoga Dataset**: Integrated 73 real yoga poses with difficulty levels, age ranges, benefits, and durations
+- **Intelligent Pose Selection**: Multi-factor scoring algorithm considering age, experience, goals, and time availability
+- **Dynamic Routine Generation**: Creates personalized routines with warmup, main sequence, and cooldown phases
+- **Advanced ML Engine**: Sophisticated recommendation system with pose variety, goal alignment, and user preference matching
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

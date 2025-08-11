@@ -1,84 +1,148 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/components/ui/navigation";
 import { Play, Pause, SkipForward, RotateCcw, Clock, Target } from "lucide-react";
+import { type YogaPose } from "../../../server/yoga-dataset";
+import { type GeneratedRoutine } from "../lib/ml-recommendations-new";
+import { useQuery } from "@tanstack/react-query";
 
-interface Pose {
-  name: string;
-  description: string;
-  duration: number;
-  instructions: string[];
-  benefits: string[];
+interface ExtendedPose extends YogaPose {
+  instructions?: string[];
 }
 
-interface Routine {
-  name: string;
-  description: string;
-  duration: number;
-  difficulty: string;
-  poses: Pose[];
+interface RoutineWithExtendedPoses extends Omit<GeneratedRoutine, 'poses'> {
+  poses: ExtendedPose[];
 }
 
-const sampleRoutine: Routine = {
+// Extended instructions for common yoga poses 
+const poseInstructions: { [key: string]: string[] } = {
+  "Mountain Pose": [
+    "Stand tall with feet hip-width apart",
+    "Ground through all four corners of your feet", 
+    "Lengthen your spine toward the sky",
+    "Relax your shoulders away from your ears",
+    "Breathe deeply and find your center"
+  ],
+  "Child's Pose": [
+    "Kneel on the mat with big toes touching",
+    "Sit back on your heels",
+    "Fold forward and rest your forehead on the mat",
+    "Extend your arms forward or by your sides",
+    "Breathe deeply and relax"
+  ],
+  "Downward Dog": [
+    "Start in tabletop position",
+    "Tuck your toes and lift your hips up",
+    "Straighten your legs as much as comfortable", 
+    "Press through your palms",
+    "Create an inverted V-shape with your body"
+  ],
+  "Warrior I": [
+    "Step your left foot back 3-4 feet",
+    "Turn your left foot out 45 degrees",
+    "Bend your right knee over your ankle",
+    "Raise your arms overhead",
+    "Hold and breathe, then switch sides"
+  ],
+  "Warrior II": [
+    "From Warrior I, open your hips and torso to the side",
+    "Extend your arms parallel to the floor",
+    "Gaze over your front hand",
+    "Keep your front knee tracking over your ankle",
+    "Hold and breathe steadily"
+  ],
+  "Tree Pose": [
+    "Stand tall in Mountain Pose",
+    "Shift weight to your left foot",
+    "Place right foot on inner left thigh or calf",
+    "Press hands together at heart center",
+    "Find a focal point and breathe"
+  ],
+  "Bridge Pose": [
+    "Lie on your back with knees bent",
+    "Place feet hip-width apart",
+    "Press into your feet and lift your hips",
+    "Interlace fingers under your back",
+    "Keep knees parallel and breathe"
+  ],
+  "Cobra Pose": [
+    "Lie face down with palms under shoulders",
+    "Press palms down and lift your chest",
+    "Keep shoulders away from ears",
+    "Engage your back muscles",
+    "Breathe and avoid straining your neck"
+  ],
+  "Plank": [
+    "Start in tabletop position",
+    "Step feet back into straight line",
+    "Keep shoulders over wrists",
+    "Engage your core muscles",
+    "Maintain straight line from head to heels"
+  ],
+  "Corpse Pose": [
+    "Lie flat on your back",
+    "Let arms rest at your sides",
+    "Close your eyes gently",
+    "Breathe naturally and deeply",
+    "Release all tension from your body"
+  ]
+};
+
+const sampleRoutine: RoutineWithExtendedPoses = {
   name: "Morning Flow",
   description: "Start your day with energizing poses",
   duration: 15,
-  difficulty: "Beginner",
+  difficulty: "beginner" as const,
+  category: "Mindfulness",
+  score: 0.9,
+  matchReasons: ["Perfect for beginners", "Great morning routine"],
   poses: [
     {
+      difficulty: "beginner" as const,
+      goal_category: "Mindfulness" as const,
       name: "Mountain Pose",
-      description: "Foundation standing pose for balance and grounding",
-      duration: 60,
-      instructions: [
-        "Stand tall with feet hip-width apart",
-        "Ground through all four corners of your feet",
-        "Lengthen your spine toward the sky",
-        "Relax your shoulders away from your ears",
-        "Breathe deeply and find your center"
-      ],
-      benefits: ["Improves posture", "Builds balance", "Reduces stress"]
+      sanskrit_name: "Tadasana",
+      min_age: 10,
+      max_age: 80,
+      benefits: "Improves focus, grounding, posture",
+      duration_sec: 60,
+      instructions: poseInstructions["Mountain Pose"]
     },
     {
+      difficulty: "beginner" as const,
+      goal_category: "Strength" as const,
       name: "Downward Dog",
-      description: "Classic inversion pose that strengthens and stretches",
-      duration: 90,
-      instructions: [
-        "Start in tabletop position",
-        "Tuck your toes and lift your hips up",
-        "Straighten your legs as much as comfortable",
-        "Press through your palms",
-        "Create an inverted V-shape with your body"
-      ],
-      benefits: ["Strengthens arms", "Stretches hamstrings", "Energizes body"]
+      sanskrit_name: "Adho Mukha Svanasana",
+      min_age: 14,
+      max_age: 70,
+      benefits: "Arm/leg strength",
+      duration_sec: 90,
+      instructions: poseInstructions["Downward Dog"]
     },
     {
+      difficulty: "beginner" as const,
+      goal_category: "Strength" as const,
       name: "Warrior I",
-      description: "Powerful standing pose that builds strength and focus",
-      duration: 75,
-      instructions: [
-        "Step your left foot back 3-4 feet",
-        "Turn your left foot out 45 degrees",
-        "Bend your right knee over your ankle",
-        "Raise your arms overhead",
-        "Hold and breathe, then switch sides"
-      ],
-      benefits: ["Builds leg strength", "Opens hips", "Improves focus"]
+      sanskrit_name: "Virabhadrasana I", 
+      min_age: 16,
+      max_age: 65,
+      benefits: "Builds leg/core strength",
+      duration_sec: 75,
+      instructions: poseInstructions["Warrior I"]
     },
     {
+      difficulty: "beginner" as const,
+      goal_category: "Mindfulness" as const,
       name: "Child's Pose",
-      description: "Restorative pose for rest and reflection",
-      duration: 120,
-      instructions: [
-        "Kneel on the mat with big toes touching",
-        "Sit back on your heels",
-        "Fold forward, extending arms in front",
-        "Rest your forehead on the mat",
-        "Breathe deeply and relax"
-      ],
-      benefits: ["Calms the mind", "Stretches back", "Reduces anxiety"]
+      sanskrit_name: "Balasana",
+      min_age: 8,
+      max_age: 85,
+      benefits: "Calms mind, reduces anxiety",
+      duration_sec: 120,
+      instructions: poseInstructions["Child's Pose"]
     }
   ]
 };
@@ -86,7 +150,7 @@ const sampleRoutine: Routine = {
 export default function StartRoutine() {
   const [location, setLocation] = useLocation();
   const [currentPoseIndex, setCurrentPoseIndex] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(sampleRoutine.poses[0]?.duration || 60);
+  const [timeRemaining, setTimeRemaining] = useState(sampleRoutine.poses[0]?.duration_sec || 60);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -102,7 +166,7 @@ export default function StartRoutine() {
             // Move to next pose
             if (currentPoseIndex < sampleRoutine.poses.length - 1) {
               setCurrentPoseIndex(currentPoseIndex + 1);
-              return sampleRoutine.poses[currentPoseIndex + 1].duration;
+              return sampleRoutine.poses[currentPoseIndex + 1].duration_sec;
             } else {
               // Routine completed
               setIsCompleted(true);
@@ -125,13 +189,13 @@ export default function StartRoutine() {
   const handleNext = () => {
     if (currentPoseIndex < sampleRoutine.poses.length - 1) {
       setCurrentPoseIndex(currentPoseIndex + 1);
-      setTimeRemaining(sampleRoutine.poses[currentPoseIndex + 1].duration);
+      setTimeRemaining(sampleRoutine.poses[currentPoseIndex + 1].duration_sec);
     }
   };
 
   const handleRestart = () => {
     setCurrentPoseIndex(0);
-    setTimeRemaining(sampleRoutine.poses[0].duration);
+    setTimeRemaining(sampleRoutine.poses[0].duration_sec);
     setIsPlaying(false);
     setIsCompleted(false);
   };
@@ -223,7 +287,7 @@ export default function StartRoutine() {
                     <motion.div
                       className="absolute inset-8 border-4 border-white/30 rounded-full"
                       style={{
-                        background: `conic-gradient(white ${((currentPose.duration - timeRemaining) / currentPose.duration) * 360}deg, transparent 0deg)`
+                        background: `conic-gradient(white ${((currentPose.duration_sec - timeRemaining) / currentPose.duration_sec) * 360}deg, transparent 0deg)`
                       }}
                     />
                     
@@ -294,7 +358,7 @@ export default function StartRoutine() {
                     {currentPose.name}
                   </h1>
                   <p className="text-xl text-wellness-600 mb-6">
-                    {currentPose.description}
+                    {currentPose.sanskrit_name} - {currentPose.benefits}
                   </p>
                 </div>
 
@@ -305,7 +369,7 @@ export default function StartRoutine() {
                       Instructions
                     </h3>
                     <ul className="space-y-2">
-                      {currentPose.instructions.map((instruction, index) => (
+                      {currentPose.instructions?.map((instruction: string, index: number) => (
                         <motion.li
                           key={index}
                           className="flex items-start"
@@ -330,7 +394,7 @@ export default function StartRoutine() {
                       Benefits
                     </h3>
                     <div className="grid grid-cols-1 gap-2">
-                      {currentPose.benefits.map((benefit, index) => (
+                      {currentPose.benefits.split(', ').map((benefit: string, index: number) => (
                         <motion.div
                           key={index}
                           className="flex items-center"
