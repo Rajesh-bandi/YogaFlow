@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Clock, Play } from "lucide-react";
+import { useLocation } from "wouter";
 import type { Routine } from "@shared/schema";
 
 interface RoutineCardProps {
@@ -28,9 +29,11 @@ const difficultyColors: { [key: string]: string } = {
 };
 
 export default function RoutineCard({ routine }: RoutineCardProps) {
+  const [, setLocation] = useLocation();
+  
   const handleStartRoutine = () => {
-    // TODO: Navigate to routine player
     console.log("Starting routine:", routine.name);
+    setLocation("/start-routine");
   };
 
   return (

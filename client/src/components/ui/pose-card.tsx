@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface Pose {
   id: string;
@@ -24,9 +25,13 @@ const difficultyColors: { [key: string]: string } = {
 };
 
 export default function PoseCard({ pose }: PoseCardProps) {
+  const [, setLocation] = useLocation();
+  
   const handleViewDetails = () => {
-    // TODO: Open pose details modal or navigate to pose detail page
     console.log("View details for:", pose.name);
+    // Convert pose name to URL-friendly slug
+    const poseSlug = pose.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    setLocation(`/pose/${poseSlug}`);
   };
 
   return (

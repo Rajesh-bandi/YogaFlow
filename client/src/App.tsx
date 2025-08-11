@@ -7,6 +7,8 @@ import Home from "@/pages/home";
 import Assessment from "@/pages/assessment";
 import Routines from "@/pages/routines";
 import Poses from "@/pages/poses";
+import StartRoutine from "@/pages/start-routine";
+import PoseDetails from "@/pages/pose-details";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/assessment" component={Assessment} />
       <Route path="/routines" component={Routines} />
       <Route path="/poses" component={Poses} />
+      <Route path="/start-routine" component={StartRoutine} />
+      <Route path="/pose/:id" component={PoseDetails} />
       <Route component={NotFound} />
     </Switch>
   );
