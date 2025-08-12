@@ -30,7 +30,7 @@ export default function Navigation() {
           
           <div className="hidden md:flex items-center space-x-8">
             <div className="flex items-center space-x-6">
-              {navItems.slice(0, -1).map((item) => (
+              {navItems.map((item) => (
                 <button
                   key={item.href}
                   onClick={() => setLocation(item.href)}
@@ -90,7 +90,7 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-wellness-200 pt-4">
             <div className="flex flex-col space-y-4">
-              {navItems.slice(0, -1).map((item) => (
+              {navItems.map((item) => (
                 <button
                   key={item.href}
                   onClick={() => {
