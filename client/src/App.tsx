@@ -23,7 +23,7 @@ function Router() {
       <Route path="/routines" component={Routines} />
       <Route path="/poses" component={Poses} />
       <Route path="/start-routine" component={StartRoutine} />
-      <Route path="/pose/:id" component={PoseDetails} />
+      <Route path="/pose/:slug" component={PoseDetails} />
       <Route component={NotFound} />
     </Switch>
   );

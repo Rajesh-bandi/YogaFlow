@@ -7,32 +7,244 @@ export interface YogaPose {
   max_age: number;
   benefits: string;
   duration_sec: number;
+  instructions?: string;
+  precautions?: string;
+  modifications?: string;
+  image?: string;
 }
 
 export const yogaDataset: YogaPose[] = [
   // Beginner - Mindfulness
-  { difficulty: 'beginner', goal_category: 'Mindfulness', name: 'Mountain Pose', sanskrit_name: 'Tadasana', min_age: 10, max_age: 80, benefits: 'Improves focus, grounding, posture', duration_sec: 30 },
-  { difficulty: 'beginner', goal_category: 'Mindfulness', name: "Child's Pose", sanskrit_name: 'Balasana', min_age: 8, max_age: 85, benefits: 'Calms mind, reduces anxiety', duration_sec: 45 },
-  { difficulty: 'beginner', goal_category: 'Mindfulness', name: 'Seated Meditation', sanskrit_name: 'Sukhasana', min_age: 10, max_age: 90, benefits: 'Enhances breath awareness', duration_sec: 60 },
-  { difficulty: 'beginner', goal_category: 'Mindfulness', name: 'Corpse Pose', sanskrit_name: 'Savasana', min_age: 12, max_age: 95, benefits: 'Deep relaxation, stress relief', duration_sec: 180 },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Mindfulness', 
+    name: 'Mountain Pose', 
+    sanskrit_name: 'Tadasana', 
+    min_age: 10, 
+    max_age: 80, 
+    benefits: 'Improves focus, grounding, posture', 
+    duration_sec: 30,
+    instructions: 'Stand tall with feet hip-width apart, arms at sides. Root down through feet, lengthen spine upward. Breathe deeply and focus on stillness.',
+    precautions: 'Those with low blood pressure should avoid holding too long',
+    modifications: 'Practice against a wall for balance support',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Mindfulness', 
+    name: "Child's Pose", 
+    sanskrit_name: 'Balasana', 
+    min_age: 8, 
+    max_age: 85, 
+    benefits: 'Calms mind, reduces anxiety', 
+    duration_sec: 45,
+    instructions: 'Kneel on floor, touch big toes together, sit back on heels. Separate knees hip-width apart, fold forward with arms extended or at sides.',
+    precautions: 'Avoid if pregnant after first trimester or with knee injuries',
+    modifications: 'Place pillow between thighs and calves for support',
+    image: 'https://images.unsplash.com/photo-1603988363607-e1e4a66962c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Mindfulness', 
+    name: 'Seated Meditation', 
+    sanskrit_name: 'Sukhasana', 
+    min_age: 10, 
+    max_age: 90, 
+    benefits: 'Enhances breath awareness', 
+    duration_sec: 60,
+    instructions: 'Sit cross-legged with spine straight, hands on knees. Close eyes and focus on natural breath rhythm.',
+    precautions: 'Use cushion or wall support if back pain occurs',
+    modifications: 'Sit on chair with feet flat on floor if cross-legged is uncomfortable',
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Mindfulness', 
+    name: 'Corpse Pose', 
+    sanskrit_name: 'Savasana', 
+    min_age: 12, 
+    max_age: 95, 
+    benefits: 'Deep relaxation, stress relief', 
+    duration_sec: 180,
+    instructions: 'Lie flat on back, legs slightly apart, arms at sides with palms up. Close eyes and completely relax each body part.',
+    precautions: 'Pregnant women should lie on left side after 20 weeks',
+    modifications: 'Place bolster under knees for lower back comfort',
+    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
 
   // Beginner - Weight Loss
-  { difficulty: 'beginner', goal_category: 'Weight Loss', name: 'Sun Salutations', sanskrit_name: 'Surya Namaskar', min_age: 12, max_age: 70, benefits: 'Full-body warm-up, burns calories', duration_sec: 300 },
-  { difficulty: 'beginner', goal_category: 'Weight Loss', name: 'Standing Forward Fold', sanskrit_name: 'Uttanasana', min_age: 14, max_age: 75, benefits: 'Stretches hamstrings, mild cardio', duration_sec: 30 },
-  { difficulty: 'beginner', goal_category: 'Weight Loss', name: 'Plank Pose', sanskrit_name: 'Phalakasana', min_age: 15, max_age: 65, benefits: 'Core engagement, fat burning', duration_sec: 30 },
-  { difficulty: 'beginner', goal_category: 'Weight Loss', name: 'Chair Pose', sanskrit_name: 'Utkatasana', min_age: 16, max_age: 60, benefits: 'Leg strength, calorie burner', duration_sec: 40 },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Weight Loss', 
+    name: 'Sun Salutations', 
+    sanskrit_name: 'Surya Namaskar', 
+    min_age: 12, 
+    max_age: 70, 
+    benefits: 'Full-body warm-up, burns calories', 
+    duration_sec: 300,
+    instructions: 'Flow through 12 poses: Mountain, Upward Salute, Forward Fold, Half Lift, Low Push-up, Upward Dog, Downward Dog, then reverse.',
+    precautions: 'Avoid during pregnancy, wrist injuries, or high blood pressure',
+    modifications: 'Step back/forward instead of jumping, use blocks for forward folds',
+    image: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Weight Loss', 
+    name: 'Standing Forward Fold', 
+    sanskrit_name: 'Uttanasana', 
+    min_age: 14, 
+    max_age: 75, 
+    benefits: 'Stretches hamstrings, mild cardio', 
+    duration_sec: 30,
+    instructions: 'Stand with feet hip-width apart, hinge at hips, fold forward letting arms hang or hold elbows.',
+    precautions: 'Avoid if you have lower back injury or high blood pressure',
+    modifications: 'Bend knees slightly, rest hands on blocks or shins',
+    image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Weight Loss', 
+    name: 'Plank Pose', 
+    sanskrit_name: 'Phalakasana', 
+    min_age: 15, 
+    max_age: 65, 
+    benefits: 'Core engagement, fat burning', 
+    duration_sec: 30,
+    instructions: 'Start in push-up position, hold body straight from head to heels, engage core and breathe steadily.',
+    precautions: 'Avoid with wrist or shoulder injuries',
+    modifications: 'Drop to knees or hold against wall at an angle',
+    image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Weight Loss', 
+    name: 'Chair Pose', 
+    sanskrit_name: 'Utkatasana', 
+    min_age: 16, 
+    max_age: 60, 
+    benefits: 'Leg strength, calorie burner', 
+    duration_sec: 40,
+    instructions: 'Stand with feet together, bend knees and sit back as if sitting in chair, raise arms overhead.',
+    precautions: 'Avoid with knee injuries or ankle problems',
+    modifications: 'Keep hands on hips, or use wall behind back for support',
+    image: 'https://images.unsplash.com/photo-1593164842264-854604db2260?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
 
   // Beginner - Posture
-  { difficulty: 'beginner', goal_category: 'Posture', name: 'Cat-Cow', sanskrit_name: 'Marjaryasana-Bitilasana', min_age: 12, max_age: 80, benefits: 'Spinal flexibility, relieves back pain', duration_sec: 60 },
-  { difficulty: 'beginner', goal_category: 'Posture', name: 'Bridge Pose', sanskrit_name: 'Setu Bandhasana', min_age: 18, max_age: 75, benefits: 'Strengthens spine, opens chest', duration_sec: 30 },
-  { difficulty: 'beginner', goal_category: 'Posture', name: 'Thread the Needle', sanskrit_name: 'Parsva Balasana', min_age: 15, max_age: 70, benefits: 'Shoulder/upper back relief', duration_sec: 45 },
-  { difficulty: 'beginner', goal_category: 'Posture', name: 'Legs-Up-the-Wall', sanskrit_name: 'Viparita Karani', min_age: 12, max_age: 85, benefits: 'Spinal decompression', duration_sec: 300 },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Posture', 
+    name: 'Cat-Cow', 
+    sanskrit_name: 'Marjaryasana-Bitilasana', 
+    min_age: 12, 
+    max_age: 80, 
+    benefits: 'Spinal flexibility, relieves back pain', 
+    duration_sec: 60,
+    instructions: 'Start on hands and knees. Arch back and look up (Cow), then round spine and tuck chin (Cat). Flow slowly between poses.',
+    precautions: 'Avoid if you have neck injuries',
+    modifications: 'Practice seated in chair or against wall if needed',
+    image: 'https://images.unsplash.com/photo-1562771379-eafdca7a02f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Posture', 
+    name: 'Bridge Pose', 
+    sanskrit_name: 'Setu Bandhasana', 
+    min_age: 18, 
+    max_age: 75, 
+    benefits: 'Strengthens spine, opens chest', 
+    duration_sec: 30,
+    instructions: 'Lie on back, bend knees, lift hips while keeping feet and shoulders grounded. Breathe deeply.',
+    precautions: 'Avoid with neck injuries or pregnancy after 20 weeks',
+    modifications: 'Place block between thighs, or put bolster under sacrum',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Posture', 
+    name: 'Thread the Needle', 
+    sanskrit_name: 'Parsva Balasana', 
+    min_age: 15, 
+    max_age: 70, 
+    benefits: 'Shoulder/upper back relief', 
+    duration_sec: 45,
+    instructions: 'Start on hands and knees. Thread right arm under left arm, lowering right shoulder to floor. Hold and repeat other side.',
+    precautions: 'Avoid with shoulder or neck injuries',
+    modifications: 'Use pillow under shoulder, or do while seated',
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Posture', 
+    name: 'Legs-Up-the-Wall', 
+    sanskrit_name: 'Viparita Karani', 
+    min_age: 12, 
+    max_age: 85, 
+    benefits: 'Spinal decompression', 
+    duration_sec: 300,
+    instructions: 'Lie with legs up wall, arms relaxed at sides. Let gravity help circulation and spine alignment.',
+    precautions: 'Avoid during menstruation or with glaucoma',
+    modifications: 'Use bolster under lower back, or bend knees if tight hamstrings',
+    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
 
   // Beginner - Stress Relief
-  { difficulty: 'beginner', goal_category: 'Stress Relief', name: 'Happy Baby', sanskrit_name: 'Ananda Balasana', min_age: 8, max_age: 90, benefits: 'Releases hip tension, calming', duration_sec: 45 },
-  { difficulty: 'beginner', goal_category: 'Stress Relief', name: 'Reclining Twist', sanskrit_name: 'Supta Matsyendrasana', min_age: 16, max_age: 80, benefits: 'Relaxes spine, aids digestion', duration_sec: 60 },
-  { difficulty: 'beginner', goal_category: 'Stress Relief', name: 'Supported Fish', sanskrit_name: 'Matsyasana', min_age: 18, max_age: 75, benefits: 'Opens heart, reduces fatigue', duration_sec: 120 },
-  { difficulty: 'beginner', goal_category: 'Stress Relief', name: 'Bumblebee Breath', sanskrit_name: 'Bhramari Pranayama', min_age: 10, max_age: 100, benefits: 'Instant stress relief', duration_sec: 180 },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Stress Relief', 
+    name: 'Happy Baby', 
+    sanskrit_name: 'Ananda Balasana', 
+    min_age: 8, 
+    max_age: 90, 
+    benefits: 'Releases hip tension, calming', 
+    duration_sec: 45,
+    instructions: 'Lie on back, bend knees to chest, grab outer edges of feet, rock gently side to side.',
+    precautions: 'Avoid if pregnant or have knee injuries',
+    modifications: 'Hold behind thighs instead of feet, or use strap around feet',
+    image: 'https://images.unsplash.com/photo-1603988363607-e1e4a66962c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Stress Relief', 
+    name: 'Reclining Twist', 
+    sanskrit_name: 'Supta Matsyendrasana', 
+    min_age: 16, 
+    max_age: 80, 
+    benefits: 'Relaxes spine, aids digestion', 
+    duration_sec: 60,
+    instructions: 'Lie on back, hug knees to chest, drop both knees to one side while keeping shoulders down. Repeat other side.',
+    precautions: 'Avoid with lower back disc issues',
+    modifications: 'Place pillow between knees, or keep knees higher',
+    image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Stress Relief', 
+    name: 'Supported Fish', 
+    sanskrit_name: 'Matsyasana', 
+    min_age: 18, 
+    max_age: 75, 
+    benefits: 'Opens heart, reduces fatigue', 
+    duration_sec: 120,
+    instructions: 'Place bolster lengthwise on mat, lie back with heart center on bolster, arms open wide.',
+    precautions: 'Avoid with neck injuries or recent chest surgery',
+    modifications: 'Use lower support like folded blanket, or sit in chair version',
+    image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
+  { 
+    difficulty: 'beginner', 
+    goal_category: 'Stress Relief', 
+    name: 'Bumblebee Breath', 
+    sanskrit_name: 'Bhramari Pranayama', 
+    min_age: 10, 
+    max_age: 100, 
+    benefits: 'Instant stress relief', 
+    duration_sec: 180,
+    instructions: 'Sit comfortably, close eyes, place thumbs in ears, index fingers above eyebrows. Hum on exhale.',
+    precautions: 'Stop if you feel dizzy or uncomfortable',
+    modifications: 'Practice without finger placement, or do shorter rounds',
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300'
+  },
 
   // Beginner - Strength
   { difficulty: 'beginner', goal_category: 'Strength', name: 'Warrior I', sanskrit_name: 'Virabhadrasana I', min_age: 16, max_age: 65, benefits: 'Builds leg/core strength', duration_sec: 40 },

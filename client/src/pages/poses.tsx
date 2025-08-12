@@ -15,6 +15,10 @@ interface YogaPose {
   max_age: number;
   benefits: string;
   duration_sec: number;
+  instructions?: string;
+  precautions?: string;
+  modifications?: string;
+  image?: string;
 }
 
 export default function Poses() {
@@ -62,7 +66,10 @@ export default function Poses() {
     difficulty: pose.difficulty,
     category: pose.goal_category.toLowerCase().replace(' ', '-'),
     duration: pose.duration_sec,
-    image: `https://images.unsplash.com/photo-${1599901860904 + (index % 10)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200`
+    instructions: pose.instructions || 'Detailed instructions coming soon',
+    precautions: pose.precautions || 'General yoga precautions apply',
+    modifications: pose.modifications || 'Modifications available upon request',
+    image: pose.image || `https://images.unsplash.com/photo-${1599901860904 + (index % 10)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300`
   }));
 
   return (
