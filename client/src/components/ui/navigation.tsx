@@ -29,25 +29,53 @@ export default function Navigation() {
           </button>
           
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.href}
-                onClick={() => setLocation(item.href)}
-                className={`font-medium transition-colors ${
-                  location === item.href 
-                    ? "text-primary-500" 
-                    : "text-wellness-600 hover:text-primary-500"
-                }`}
+            <div className="flex items-center space-x-6">
+              {navItems.slice(0, -1).map((item) => (
+                <button
+                  key={item.href}
+                  onClick={() => setLocation(item.href)}
+                  className={`font-medium transition-colors ${
+                    location === item.href 
+                      ? "text-primary-500" 
+                      : "text-wellness-600 hover:text-primary-500"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button 
+                onClick={() => window.open("https://youtu.be/dQw4w9WgXcQ", "_blank")}
+                variant="outline"
+                size="sm"
+                className="px-4 py-2 border-primary-500 text-primary-600 hover:bg-primary-50 transition-colors"
               >
-                {item.label}
-              </button>
-            ))}
-            <Button 
-              onClick={() => setLocation("/assessment")}
-              className="gradient-bg text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transform hover:scale-105 transition-all"
-            >
-              Get Started
-            </Button>
+                Watch Demo
+              </Button>
+              <Button 
+                onClick={() => setLocation("/login")}
+                variant="ghost"
+                size="sm"
+                className="px-4 py-2 text-wellness-600 hover:bg-gray-100 transition-colors"
+              >
+                Log In
+              </Button>
+              <Button 
+                onClick={() => setLocation("/signup")}
+                size="sm"
+                className="gradient-bg text-white px-4 py-2 rounded-full font-medium hover:shadow-lg transform hover:scale-105 transition-all"
+              >
+                Sign Up
+              </Button>
+              <Button 
+                onClick={() => setLocation("/assessment")}
+                size="sm"
+                className="bg-secondary-500 text-white px-4 py-2 rounded-full font-medium hover:bg-secondary-600 transform hover:scale-105 transition-all"
+              >
+                Get Started
+              </Button>
+            </div>
           </div>
           
           <button 
@@ -62,7 +90,7 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-wellness-200 pt-4">
             <div className="flex flex-col space-y-4">
-              {navItems.map((item) => (
+              {navItems.slice(0, -1).map((item) => (
                 <button
                   key={item.href}
                   onClick={() => {
@@ -78,15 +106,50 @@ export default function Navigation() {
                   {item.label}
                 </button>
               ))}
-              <Button 
-                onClick={() => {
-                  setLocation("/assessment");
-                  setIsMenuOpen(false);
-                }}
-                className="gradient-bg text-white px-6 py-2 rounded-full font-medium w-fit"
-              >
-                Get Started
-              </Button>
+              <div className="flex flex-col space-y-3 pt-2">
+                <Button 
+                  onClick={() => {
+                    window.open("https://youtu.be/dQw4w9WgXcQ", "_blank");
+                    setIsMenuOpen(false);
+                  }}
+                  variant="outline"
+                  className="border-primary-500 text-primary-600 hover:bg-primary-50 w-fit"
+                >
+                  Watch Demo
+                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => {
+                      setLocation("/login");
+                      setIsMenuOpen(false);
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    className="text-wellness-600 hover:bg-gray-100"
+                  >
+                    Log In
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setLocation("/signup");
+                      setIsMenuOpen(false);
+                    }}
+                    size="sm"
+                    className="gradient-bg text-white px-4 py-2 rounded-full font-medium"
+                  >
+                    Sign Up
+                  </Button>
+                </div>
+                <Button 
+                  onClick={() => {
+                    setLocation("/assessment");
+                    setIsMenuOpen(false);
+                  }}
+                  className="bg-secondary-500 text-white px-6 py-2 rounded-full font-medium hover:bg-secondary-600 w-fit"
+                >
+                  Get Started
+                </Button>
+              </div>
             </div>
           </div>
         )}

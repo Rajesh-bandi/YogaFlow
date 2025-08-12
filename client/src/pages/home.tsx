@@ -39,7 +39,7 @@ export default function Home() {
 
   const stats = [
     { label: "Active Users", value: "10K+" },
-    { label: "Yoga Poses", value: "500+" },
+    { label: "Yoga Poses", value: "73+" },
     { label: "Satisfaction", value: "95%" }
   ];
 

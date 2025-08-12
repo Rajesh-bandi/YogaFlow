@@ -105,7 +105,9 @@ export class MemStorage implements IStorage {
   async createAssessment(assessment: InsertAssessment): Promise<Assessment> {
     const id = randomUUID();
     const newAssessment: Assessment = { 
-      ...assessment, 
+      ...assessment,
+      userId: assessment.userId || null,
+      healthConditions: assessment.healthConditions || null,
       id,
       createdAt: new Date().toISOString()
     };
@@ -147,7 +149,10 @@ export class MemStorage implements IStorage {
   async createUserProgress(progress: InsertUserProgress): Promise<UserProgress> {
     const id = randomUUID();
     const newProgress: UserProgress = { 
-      ...progress, 
+      ...progress,
+      userId: progress.userId || null,
+      routineId: progress.routineId || null,
+      rating: progress.rating || null,
       id,
       completedAt: new Date().toISOString()
     };

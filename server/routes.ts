@@ -1,10 +1,64 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAssessmentSchema, insertUserProgressSchema } from "@shared/schema";
+import { insertAssessmentSchema, insertUserProgressSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
+import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, password } = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Create user
+      const user = await storage.createUser({ username, password: hashedPassword });
+      
+      // Don't return password in response
+      const { password: _, ...userResponse } = user;
+      res.status(201).json(userResponse);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message || "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      // Find user
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Don't return password in response
+      const { password: _, ...userResponse } = user;
+      res.json({ message: "Login successful", user: userResponse });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Login failed" });
+    }
+  });
+
   // Assessment routes
   app.post("/api/assessment", async (req, res) => {
     try {
@@ -59,6 +113,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(routine);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch routine", error });
+    }
+  });
+
+  // Poses routes - serve real yoga dataset
+  app.get("/api/poses", async (req, res) => {
+    try {
+      const { yogaDataset } = await import("./yoga-dataset");
+      res.json(yogaDataset);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch poses", error });
+    }
+  });
+
+  app.get("/api/poses/:id", async (req, res) => {
+    try {
+      const { yogaDataset } = await import("./yoga-dataset");
+      const { id } = req.params;
+      const pose = yogaDataset[parseInt(id)];
+      if (!pose) {
+        return res.status(404).json({ message: "Pose not found" });
+      }
+      res.json({ ...pose, id: parseInt(id) });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch pose", error });
+    }
+  });
+
+  app.get("/api/poses/category/:category", async (req, res) => {
+    try {
+      const { yogaDataset } = await import("./yoga-dataset");
+      const { category } = req.params;
+      const poses = yogaDataset.filter(pose => 
+        pose.goal_category.toLowerCase() === category.toLowerCase()
+      );
+      res.json(poses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch poses by category", error });
+    }
+  });
+
+  app.get("/api/poses/difficulty/:difficulty", async (req, res) => {
+    try {
+      const { yogaDataset } = await import("./yoga-dataset");
+      const { difficulty } = req.params;
+      const poses = yogaDataset.filter(pose => 
+        pose.difficulty.toLowerCase() === difficulty.toLowerCase()
+      );
+      res.json(poses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch poses by difficulty", error });
     }
   });
 

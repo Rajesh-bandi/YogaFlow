@@ -9,12 +9,16 @@ import Routines from "@/pages/routines";
 import Poses from "@/pages/poses";
 import StartRoutine from "@/pages/start-routine";
 import PoseDetails from "@/pages/pose-details";
+import Login from "@/pages/login";
+import SignUp from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={SignUp} />
       <Route path="/assessment" component={Assessment} />
       <Route path="/routines" component={Routines} />
       <Route path="/poses" component={Poses} />
