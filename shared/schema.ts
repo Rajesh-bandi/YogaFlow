@@ -7,6 +7,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  email: text("email"),
 });
 
 export const assessments = pgTable("assessments", {
@@ -43,6 +44,7 @@ export const userProgress = pgTable("user_progress", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  email: true,
 });
 
 export const insertAssessmentSchema = createInsertSchema(assessments).omit({

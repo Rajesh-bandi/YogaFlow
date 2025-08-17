@@ -1,9 +1,10 @@
-import { type User, type InsertUser, type Assessment, type InsertAssessment, type Routine, type InsertRoutine, type UserProgress, type InsertUserProgress } from "@shared/schema";
+import { type User, type InsertUser, type Assessment, type InsertAssessment, type Routine, type InsertRoutine, type UserProgress, type InsertUserProgress } from "server/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  listUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   
   createAssessment(assessment: InsertAssessment): Promise<Assessment>;
@@ -95,9 +96,13 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async listUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const user: User = { ...insertUser, id } as User;
     this.users.set(id, user);
     return user;
   }

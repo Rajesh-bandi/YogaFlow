@@ -6,80 +6,87 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 export default function SignUp() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
+  const [code, setCode] = useState("");
+  const [codeRequested, setCodeRequested] = useState(false);
 
-  const signupMutation = useMutation({
-    mutationFn: (data: { username: string; password: string }) => 
-      fetch("/api/auth/register", {
+  const requestCodeMutation = useMutation({
+    mutationFn: async (data: { username: string; email: string }) => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const res = await fetch(`${apiUrl}/auth/signup/request-code`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      }).then(res => {
-        if (!res.ok) {
-          return res.json().then(err => Promise.reject(err));
-        }
-        return res.json();
-      }),
-    onSuccess: () => {
-      toast({
-        title: "Account created!",
-        description: "Welcome to YogaFlow. You can now sign in.",
       });
-      setLocation("/login");
+      if (!res.ok) throw await res.json();
+      return res.json();
     },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Registration failed",
-        description: error.message || "Could not create account. Please try again.",
-      });
+    onSuccess: () => {
+      setCodeRequested(true);
+      toast({ title: "Verification code sent", description: "Check your email for a 6-digit code." });
+    },
+    onError: (err: any) => {
+      toast({ variant: "destructive", title: "Could not send code", description: err?.message || "Please try again." });
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const verifySignupMutation = useMutation({
+    mutationFn: async (data: { username: string; email: string; password: string; code: string }) => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const res = await fetch(`${apiUrl}/auth/signup/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw await res.json();
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Account created!", description: "You can now sign in." });
+      setLocation("/login");
+    },
+    onError: (err: any) => {
+      toast({ variant: "destructive", title: "Verification failed", description: err?.message || "Please try again." });
+    },
+  });
+
+  const handleRequestCode = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.username || !formData.password || !formData.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Missing fields",
-        description: "Please fill in all required fields.",
-      });
+    if (!formData.username || !formData.email) {
+      toast({ variant: "destructive", title: "Missing fields", description: "Enter username and email first." });
       return;
     }
+    requestCodeMutation.mutate({ username: formData.username, email: formData.email });
+  };
 
+  const handleVerifyAndCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast({ variant: "destructive", title: "Missing fields", description: "Please fill in all required fields." });
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Password mismatch",
-        description: "Passwords do not match. Please try again.",
-      });
+      toast({ variant: "destructive", title: "Password mismatch", description: "Passwords do not match." });
       return;
     }
-
-    if (formData.password.length < 6) {
-      toast({
-        variant: "destructive",
-        title: "Password too short",
-        description: "Password must be at least 6 characters long.",
-      });
+    if (!code || code.length < 6) {
+      toast({ variant: "destructive", title: "Enter your code", description: "Enter the 6-digit verification code." });
       return;
     }
-
-    signupMutation.mutate({
+    verifySignupMutation.mutate({
       username: formData.username,
+      email: formData.email,
       password: formData.password,
+      code,
     });
   };
 
@@ -97,7 +104,7 @@ export default function SignUp() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -106,6 +113,17 @@ export default function SignUp() {
                 placeholder="Choose a username"
                 value={formData.username}
                 onChange={(e) => handleInputChange("username", e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email address"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
                 required
               />
             </div>
@@ -131,13 +149,42 @@ export default function SignUp() {
                 required
               />
             </div>
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={signupMutation.isPending}
-            >
-              {signupMutation.isPending ? "Creating account..." : "Create Account"}
-            </Button>
+
+            {!codeRequested && (
+              <Button
+                onClick={handleRequestCode}
+                className="w-full"
+                type="button"
+                disabled={requestCodeMutation.isPending}
+              >
+                {requestCodeMutation.isPending ? "Sending code…" : "Send verification code"}
+              </Button>
+            )}
+
+            {codeRequested && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="code">Verification Code</Label>
+                  <Input
+                    id="code"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Enter 6-digit code"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    maxLength={6}
+                  />
+                </div>
+                <Button
+                  onClick={handleVerifyAndCreate}
+                  className="w-full"
+                  type="button"
+                  disabled={verifySignupMutation.isPending}
+                >
+                  {verifySignupMutation.isPending ? "Creating account…" : "Verify and create account"}
+                </Button>
+              </>
+            )}
           </form>
           <div className="mt-4 text-center text-sm">
             <span className="text-muted-foreground">Already have an account? </span>

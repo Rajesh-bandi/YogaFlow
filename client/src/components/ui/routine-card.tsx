@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Clock, Play } from "lucide-react";
 import { useLocation } from "wouter";
-import type { Routine } from "@shared/schema";
+import type { Routine } from "server/schema";
 
 interface RoutineCardProps {
   routine: Routine;

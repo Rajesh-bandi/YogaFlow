@@ -9,8 +9,12 @@ import { type YogaPose } from "../../../server/yoga-dataset";
 import { type GeneratedRoutine } from "../lib/ml-recommendations-new";
 import { useQuery } from "@tanstack/react-query";
 
-interface ExtendedPose extends YogaPose {
+interface ExtendedPose extends Omit<YogaPose, 'instructions'> {
   instructions?: string[];
+  precautions?: string;
+  modifications?: string;
+  image?: string;
+  youtube_link?: string;
 }
 
 interface RoutineWithExtendedPoses extends Omit<GeneratedRoutine, 'poses'> {
@@ -147,28 +151,104 @@ const sampleRoutine: RoutineWithExtendedPoses = {
   ]
 };
 
+// Utility to get recommended poses from localStorage
+// Ensure instructions is always an array
+function getRoutineFromLocalStorage(): RoutineWithExtendedPoses {
+  const stored = typeof window !== 'undefined' ? localStorage.getItem("routinePoses") : null;
+  let poses: ExtendedPose[] = [];
+  if (stored) {
+    try {
+      const raw = JSON.parse(stored);
+      poses = raw.map((pose: any) => ({
+        ...pose,
+        instructions: Array.isArray(pose.instructions)
+          ? pose.instructions
+          : typeof pose.instructions === 'string'
+            ? [pose.instructions]
+            : poseInstructions[pose.name] || [],
+        precautions: pose.precautions || "",
+        modifications: pose.modifications || "",
+        image: '', // will be set below
+        youtube_link: pose.youtube_link || ""
+      })).filter((pose: any) => pose && pose.name);
+      // Fetch pose-images.json and update images
+      if (typeof window !== 'undefined') {
+        fetch('/pose-images.json')
+          .then(res => res.json())
+          .then((mapping) => {
+            poses.forEach((pose) => {
+              if (pose.name && mapping[pose.name]) {
+                pose.image = mapping[pose.name];
+              }
+            });
+          });
+      }
+    } catch {}
+  }
+  return {
+    name: "Personalized Routine",
+    description: "Your recommended yoga sequence",
+    duration: poses.reduce((sum, p) => sum + (p.duration_sec || 0), 0),
+    difficulty: poses[0]?.difficulty || "beginner",
+    category: poses[0]?.goal_category || "Mindfulness",
+    score: 1,
+    matchReasons: [],
+    poses
+  };
+}
+
 export default function StartRoutine() {
   const [location, setLocation] = useLocation();
+  const [routine, setRoutine] = useState<RoutineWithExtendedPoses>(getRoutineFromLocalStorage());
   const [currentPoseIndex, setCurrentPoseIndex] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(sampleRoutine.poses[0]?.duration_sec || 60);
+  const [timeRemaining, setTimeRemaining] = useState(routine.poses[0]?.duration_sec || 60);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  
+  useEffect(() => {
+    if (isCompleted && routine && routine.poses.length > 0) {
+      const user = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem("user") || "{}") : {};
+      const userId: string | undefined = user?.id || user?.userId || user?.username;
+      const totalDuration = routine.poses.reduce((sum, p) => sum + (p.duration_sec || 0), 0);
+      const completedPoses = routine.poses.map((p) => p.name);
+      if (userId) {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  fetch(`${apiUrl}/progress`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId,
+            routineId: routine.name,
+            duration: totalDuration,
+            rating: null,
+            completedPoses
+          })
+        }).catch(() => {});
+      }
+    }
+  }, [isCompleted, routine]);
 
-  const currentPose = sampleRoutine.poses[currentPoseIndex];
+  const currentPose = routine.poses[currentPoseIndex];
+
+  useEffect(() => {
+    setRoutine(getRoutineFromLocalStorage());
+    setCurrentPoseIndex(0);
+    setTimeRemaining(routine.poses[0]?.duration_sec || 60);
+    setIsCompleted(false);
+    setIsPlaying(false);
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
     if (isPlaying && timeRemaining > 0 && !isCompleted) {
       interval = setInterval(() => {
         setTimeRemaining((prev) => {
           if (prev <= 1) {
-            // Move to next pose
-            if (currentPoseIndex < sampleRoutine.poses.length - 1) {
+            if (currentPoseIndex < routine.poses.length - 1) {
               setCurrentPoseIndex(currentPoseIndex + 1);
-              return sampleRoutine.poses[currentPoseIndex + 1].duration_sec;
+              return routine.poses[currentPoseIndex + 1].duration_sec;
             } else {
-              // Routine completed
               setIsCompleted(true);
               setIsPlaying(false);
               return 0;
@@ -178,24 +258,25 @@ export default function StartRoutine() {
         });
       }, 1000);
     }
-
     return () => clearInterval(interval);
-  }, [isPlaying, timeRemaining, currentPoseIndex, isCompleted]);
+  }, [isPlaying, timeRemaining, currentPoseIndex, isCompleted, routine.poses]);
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
 
   const handleNext = () => {
-    if (currentPoseIndex < sampleRoutine.poses.length - 1) {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    if (currentPoseIndex < routine.poses.length - 1) {
       setCurrentPoseIndex(currentPoseIndex + 1);
-      setTimeRemaining(sampleRoutine.poses[currentPoseIndex + 1].duration_sec);
+      setTimeRemaining(routine.poses[currentPoseIndex + 1].duration_sec);
     }
   };
 
   const handleRestart = () => {
     setCurrentPoseIndex(0);
-    setTimeRemaining(sampleRoutine.poses[0].duration_sec);
+    setTimeRemaining(routine.poses[0].duration_sec);
     setIsPlaying(false);
     setIsCompleted(false);
   };
@@ -207,10 +288,36 @@ export default function StartRoutine() {
   };
 
   if (isCompleted) {
+    // Streak logic
+    const today = new Date().toISOString().slice(0, 10);
+    const lastStreakDate = typeof window !== 'undefined' ? localStorage.getItem("lastStreakDate") : null;
+    let streak = typeof window !== 'undefined' ? parseInt(localStorage.getItem("streak") || "0", 10) : 0;
+    if (lastStreakDate !== today) {
+      if (
+        lastStreakDate &&
+        new Date(today).getTime() - new Date(lastStreakDate).getTime() <= 86400000
+      ) {
+        streak += 1;
+      } else {
+        streak = 1;
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("streak", streak.toString());
+        localStorage.setItem("lastStreakDate", today);
+      }
+    }
+    // Check if today is the first routine completion of the month
+    const monthKey = `routineMonth_${today.slice(0,7)}`;
+    let isFirstOfMonth = false;
+    if (typeof window !== 'undefined') {
+      if (!localStorage.getItem(monthKey)) {
+        isFirstOfMonth = true;
+        localStorage.setItem(monthKey, "done");
+      }
+    }
     return (
       <div className="min-h-screen bg-gradient-to-br from-wellness-50 to-white">
         <Navigation />
-        
         <motion.div
           className="pt-24 pb-12 px-6"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -225,7 +332,6 @@ export default function StartRoutine() {
             >
               <span className="text-3xl">🧘‍♀️</span>
             </motion.div>
-            
             <h1 className="font-poppins font-bold text-4xl mb-6 gradient-text">
               Routine Complete!
             </h1>
@@ -233,7 +339,12 @@ export default function StartRoutine() {
               Congratulations on completing your {sampleRoutine.name} routine. 
               You've taken an important step in your wellness journey.
             </p>
-            
+            <div className="mb-8">
+              <span className={`inline-block rounded-full px-6 py-3 font-semibold text-xl shadow ${isFirstOfMonth ? 'bg-green-100 text-green-700' : 'bg-primary-100 text-primary-700'}`}>
+                🔥 Streak: {streak} day{streak === 1 ? "" : "s"}!
+                {isFirstOfMonth && <span className="ml-2">🟢 First routine of the month!</span>}
+              </span>
+            </div>
             <div className="flex gap-4 justify-center flex-wrap">
               <Button
                 onClick={handleRestart}
@@ -259,7 +370,6 @@ export default function StartRoutine() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-wellness-50 to-white">
       <Navigation />
-      
       <div className="pt-24 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -272,34 +382,68 @@ export default function StartRoutine() {
             >
               <Card className="bg-white shadow-xl border-none overflow-hidden">
                 <CardContent className="p-0">
-                  <div className="relative h-96 bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center">
+                  <div className="relative w-full max-w-md mx-auto flex items-center justify-center aspect-square sm:aspect-square md:aspect-square lg:aspect-square" style={{ maxHeight: '340px' }}>
+                    {/* Border Timer */}
+                    <div className="absolute inset-0 w-full h-full z-20 overflow-hidden">
+                      <motion.div
+                        className="absolute inset-0 border-[6px] border-primary-500 rounded-xl"
+                        style={{ 
+                          clipPath: `polygon(
+                            0 0, 100% 0, 100% 100%, 0 100%, 
+                            0 0, 6px 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), 
+                            calc(100% - 6px) 6px, 6px 6px
+                          )`,
+                        }}
+                        animate={{
+                          clipPath: [
+                            `polygon(
+                              0 0, 100% 0, 100% 100%, 0 100%, 
+                              0 0, 6px 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), 
+                              calc(100% - 6px) 6px, 6px 6px
+                            )`,
+                            `polygon(
+                              0 0, 100% 0, 100% 100%, 0 100%, 
+                              0 0, 100% 0, 100% 100%, 0 100%, 
+                              0 0, 6px 6px
+                            )`,
+                          ],
+                        }}
+                        transition={{
+                          duration: currentPose.duration_sec,
+                          ease: "linear"
+                        }}
+                      />
+                    </div>
+                    {/* Pose Image */}
                     <motion.div
-                      className="text-white text-8xl"
                       key={currentPose.name}
                       initial={{ scale: 0.5, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ duration: 0.8, type: "spring" }}
+                      className="absolute inset-0 w-full h-full z-10 flex items-center justify-center"
                     >
-                      🧘‍♀️
+                      {currentPose.image ? (
+                        <img
+                          src={currentPose.image}
+                          alt={currentPose.name}
+                          className="w-full h-full object-cover rounded-xl"
+                          style={{ background: "transparent", maxHeight: '340px' }}
+                        />
+                      ) : (
+                        <span className="text-white text-6xl sm:text-8xl">🧘‍♀️</span>
+                      )}
                     </motion.div>
-                    
-                    {/* Progress ring */}
-                    <motion.div
-                      className="absolute inset-8 border-4 border-white/30 rounded-full"
-                      style={{
-                        background: `conic-gradient(white ${((currentPose.duration_sec - timeRemaining) / currentPose.duration_sec) * 360}deg, transparent 0deg)`
-                      }}
-                    />
-                    
-                    {/* Timer */}
-                    <div className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                      <div className="text-white text-2xl font-bold">
+                    {/* Timer at bottom left */}
+                    <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 z-30 flex items-center">
+                      <svg className="w-6 h-6 mr-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+                      </svg>
+                      <div className="text-white text-xl font-bold">
                         {formatTime(timeRemaining)}
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="p-6">
+                  <div className="p-4 sm:p-6">
                     <div className="flex justify-center mb-6">
                       <div className="flex gap-2">
                         <Button
@@ -310,7 +454,7 @@ export default function StartRoutine() {
                         </Button>
                         <Button
                           onClick={handleNext}
-                          disabled={currentPoseIndex >= sampleRoutine.poses.length - 1}
+                          disabled={currentPoseIndex >= routine.poses.length - 1}
                           variant="outline"
                           className="w-16 h-16 rounded-full"
                         >
@@ -325,20 +469,19 @@ export default function StartRoutine() {
                         </Button>
                       </div>
                     </div>
-                    
                     {/* Progress bar */}
                     <div className="w-full bg-wellness-100 rounded-full h-2 mb-4">
                       <motion.div
                         className="gradient-bg h-2 rounded-full"
                         initial={{ width: 0 }}
                         animate={{ 
-                          width: `${((currentPoseIndex + 1) / sampleRoutine.poses.length) * 100}%` 
+                          width: `${((currentPoseIndex + 1) / routine.poses.length) * 100}%` 
                         }}
                         transition={{ duration: 0.3 }}
                       />
                     </div>
                     <p className="text-center text-wellness-600">
-                      Pose {currentPoseIndex + 1} of {sampleRoutine.poses.length}
+                      Pose {currentPoseIndex + 1} of {routine.poses.length}
                     </p>
                   </div>
                 </CardContent>
@@ -384,6 +527,45 @@ export default function StartRoutine() {
                         </motion.li>
                       ))}
                     </ul>
+                    <div className="flex justify-center mt-4">
+                      <Button
+                        onClick={() => {
+                          if (isSpeaking) {
+                            window.speechSynthesis.cancel();
+                            setIsSpeaking(false);
+                          } else {
+                            window.speechSynthesis.cancel();
+                            if (Array.isArray(currentPose.instructions) && currentPose.instructions.length > 0) {
+                              let idx = 0;
+                              setIsSpeaking(true);
+                              const speakNext = () => {
+                                if (!Array.isArray(currentPose.instructions) || idx >= currentPose.instructions.length) {
+                                  setIsSpeaking(false);
+                                  return;
+                                }
+                                const utterance = new window.SpeechSynthesisUtterance(currentPose.instructions[idx]);
+                                utterance.rate = 0.8;
+                                utterance.onend = () => {
+                                  setTimeout(() => {
+                                    idx++;
+                                    speakNext();
+                                  }, 700);
+                                };
+                                utterance.onerror = () => {
+                                  setIsSpeaking(false);
+                                };
+                                window.speechSynthesis.speak(utterance);
+                              };
+                              speakNext();
+                            }
+                          }
+                        }}
+                        variant="outline"
+                        className="px-6 py-2"
+                      >
+                        {isSpeaking ? "Stop" : "Read Instructions Aloud"}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -409,6 +591,65 @@ export default function StartRoutine() {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Precautions and Modifications */}
+                <Card className="bg-white shadow-lg border-none">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-xl mb-4 flex items-center">
+                      <span className="text-red-500 mr-2">⚠️</span>
+                      Precautions
+                    </h3>
+                    <div className="text-wellness-700">
+                      {currentPose.precautions || "No specific precautions."}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white shadow-lg border-none">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-xl mb-4 flex items-center">
+                      <span className="text-yellow-500 mr-2">⚙️</span>
+                      Modifications
+                    </h3>
+                    <div className="text-wellness-700">
+                      {currentPose.modifications || "No specific modifications."}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Media */}
+                {(currentPose.image || currentPose.youtube_link) && (
+                  <Card className="bg-white shadow-lg border-none">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-xl mb-4 flex items-center">
+                        <span className="text-primary-500 mr-2">📹</span>
+                        Media
+                      </h3>
+                      <div className="flex gap-4">
+                        {currentPose.image && (
+                          <img 
+                            src={currentPose.image} 
+                            alt={currentPose.name} 
+                            className="w-full h-auto rounded-lg shadow-md"
+                          />
+                        )}
+                        {currentPose.youtube_link && (
+                          <a 
+                            href={currentPose.youtube_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex-1 bg-primary-500 text-white rounded-lg shadow-md px-4 py-2 flex items-center justify-center gap-2"
+                          >
+                            <span>Watch on YouTube</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A4.125 4.125 0 119 14.625M15.75 9.75l-3.375 3.375L15.75 16.5M21 12H3" />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </motion.div>
           </div>

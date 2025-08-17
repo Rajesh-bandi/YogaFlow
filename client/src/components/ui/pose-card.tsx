@@ -1,4 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
+import React, { useState } from "react";
+// @ts-ignore
+// Remove direct import; will fetch at runtime
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
@@ -31,8 +34,19 @@ const difficultyColors: { [key: string]: string } = {
 
 export default function PoseCard({ pose }: PoseCardProps) {
   const [, setLocation] = useLocation();
-  
+  const [imgSrc, setImgSrc] = useState(pose.image);
+  React.useEffect(() => {
+    fetch("/pose-images.json")
+      .then(res => res.json())
+      .then((mapping) => {
+        if (mapping[pose.name]) {
+          setImgSrc(mapping[pose.name]);
+        }
+      });
+  }, [pose.name]);
+
   const handleViewDetails = () => {
+    if (!pose.name) return;
     console.log("View details for:", pose.name);
     // Convert pose name to URL-friendly slug
     const poseSlug = pose.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -43,10 +57,11 @@ export default function PoseCard({ pose }: PoseCardProps) {
     <Card className="bg-wellness-50 border-none rounded-2xl hover:shadow-lg transition-all transform hover:-translate-y-1">
       <CardContent className="p-6">
         <div className="relative overflow-hidden rounded-xl mb-4">
-          <img 
-            src={pose.image} 
+          <img
+            src={imgSrc}
             alt={pose.name}
-            className="w-full h-48 object-cover transition-transform hover:scale-105" 
+            className="w-full h-48 object-cover transition-transform hover:scale-105"
+            onError={() => setImgSrc("https://images.pexels.com/photos/3823039/pexels-photo-3823039.jpeg?auto=compress&w=400&h=300")}
           />
           <div className="absolute top-2 right-2">
             <Badge className={`${difficultyColors[pose.difficulty]} text-white text-xs shadow-md`}>
@@ -73,7 +88,7 @@ export default function PoseCard({ pose }: PoseCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs border-wellness-300">
-              {pose.category.replace('-', ' ')}
+              {pose.category ? pose.category.replace('-', ' ') : ''}
             </Badge>
           </div>
           <Button 

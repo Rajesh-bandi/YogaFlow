@@ -16,21 +16,26 @@ export default function Login() {
     password: "",
   });
 
+  const apiUrl = import.meta.env.VITE_API_URL;
   const loginMutation = useMutation({
-    mutationFn: (data: typeof formData) => 
-      fetch("/api/auth/login", {
+    mutationFn: async (data: typeof formData) => {
+      const res = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }).then(res => {
-        if (!res.ok) {
-          return res.json().then(err => Promise.reject(err));
-        }
-        return res.json();
-      }),
-    onSuccess: () => {
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Login failed");
+      }
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data && data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
       toast({
         title: "Welcome back!",
         description: "You've successfully logged in.",

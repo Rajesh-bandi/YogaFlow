@@ -1,4 +1,4 @@
-import type { Assessment, Routine } from "@shared/schema";
+import type { Assessment, Routine } from "server/schema";
 
 export interface RecommendationInput {
   ageGroup: string;

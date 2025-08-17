@@ -7,7 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { queryClient } from "../../lib/queryClient";
+// import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Loader2, Sprout, Leaf, TreePine, Clock, Timer, CalendarClock, CalendarCheck } from "lucide-react";
@@ -20,7 +21,7 @@ const assessmentSchema = z.object({
   healthConditions: z.array(z.string()).optional(),
 });
 
-type AssessmentFormData = z.infer<typeof assessmentSchema>;
+type AssessmentFormData = z.infer<typeof assessmentSchema> & { username?: string };
 
 export default function AssessmentForm() {
   const [, setLocation] = useLocation();
@@ -28,6 +29,7 @@ export default function AssessmentForm() {
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
   const [selectedExperience, setSelectedExperience] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [recommendedPoses, setRecommendedPoses] = useState<string[]>([]);
 
   const form = useForm<AssessmentFormData>({
     resolver: zodResolver(assessmentSchema),
@@ -42,16 +44,40 @@ export default function AssessmentForm() {
 
   const generateRecommendationsMutation = useMutation({
     mutationFn: async (data: AssessmentFormData) => {
-      return apiRequest("POST", "/api/recommendations", data);
+      // Call backend endpoint (which will call ML model and store recommendations)
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${apiUrl}/assessment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to fetch recommendations");
+      return response.json();
     },
-    onSuccess: () => {
+  onSuccess: (result: any) => {
       toast({
         title: "Assessment Complete!",
         description: "Your personalized routines have been generated.",
       });
-      setLocation("/routines");
+      // For testing: show recommended poses below the button
+      if (result && result.recommendations) {
+        setRecommendedPoses(result.recommendations);
+    console.log("Recommended poses:", result.recommendations);
+      } else if (result && result.recommendedPoses) {
+        setRecommendedPoses(result.recommendedPoses);
+    console.log("Recommended poses:", result.recommendedPoses);
+      } else {
+        setRecommendedPoses([]);
+    console.log("No recommended poses returned.");
+      }
+      // Invalidate routines query so routines page shows latest poses
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user && user.username) {
+        queryClient.invalidateQueries({ queryKey: ["recommended-poses", user.username] });
+      }
+      // setLocation("/routines"); // Remove redirect for testing
     },
-    onError: (error) => {
+  onError: (error: any) => {
       toast({
         title: "Error",
         description: "Failed to generate recommendations. Please try again.",
@@ -61,14 +87,27 @@ export default function AssessmentForm() {
   });
 
   const onSubmit = (data: AssessmentFormData) => {
-    generateRecommendationsMutation.mutate(data);
-  };
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!user || !user.id || !user.username) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to generate your personalized routine.",
+        variant: "destructive",
+      });
+      return;
+    }
+    generateRecommendationsMutation.mutate({
+      ...data,
+      username: user.username,
+    });
+  }
 
   const ageGroups = [
+    { value: "<18", label: "Under 18" },
     { value: "18-25", label: "18-25" },
     { value: "26-35", label: "26-35" },
     { value: "36-50", label: "36-50" },
-    { value: "50+", label: "50+" },
+    { value: "50+", label: "Above 50" },
   ];
 
   const experienceLevels = [
@@ -117,7 +156,7 @@ export default function AssessmentForm() {
             <FormField
               control={form.control}
               name="ageGroup"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel className="text-lg font-semibold text-wellness-800">
                     What's your age group?
@@ -152,7 +191,7 @@ export default function AssessmentForm() {
             <FormField
               control={form.control}
               name="experience"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel className="text-lg font-semibold text-wellness-800">
                     What's your yoga experience?
@@ -202,16 +241,16 @@ export default function AssessmentForm() {
                         key={goal}
                         control={form.control}
                         name="goals"
-                        render={({ field }) => (
+                        render={({ field }: { field: any }) => (
                           <FormItem className="flex items-center space-x-3 p-4 border-2 border-wellness-200 rounded-xl hover:bg-wellness-100 transition-all cursor-pointer">
                             <FormControl>
                               <Checkbox
                                 checked={field.value?.includes(goal)}
-                                onCheckedChange={(checked) => {
+                                onCheckedChange={(checked: boolean) => {
                                   return checked
                                     ? field.onChange([...field.value, goal])
                                     : field.onChange(
-                                        field.value?.filter((value) => value !== goal)
+                                        field.value?.filter((value: string) => value !== goal)
                                       );
                                 }}
                               />
@@ -233,7 +272,7 @@ export default function AssessmentForm() {
             <FormField
               control={form.control}
               name="timeAvailable"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel className="text-lg font-semibold text-wellness-800">
                     How much time can you dedicate daily?
@@ -283,6 +322,7 @@ export default function AssessmentForm() {
                   </>
                 )}
               </Button>
+              {/* Show recommended poses below the button for testing */}
             </div>
           </form>
         </Form>

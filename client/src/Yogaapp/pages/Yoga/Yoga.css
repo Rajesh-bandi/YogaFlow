@@ -1,0 +1,114 @@
+
+
+    .yoga-container {
+        background: #f7f9fb;
+        min-width: 100vw;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 40px;
+    }
+
+
+
+.secondary-btn {
+    margin: 24px auto;
+    padding: 12px 32px;
+    border-radius: 8px;
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.secondary-btn:hover {
+    background: #1742a0;
+}
+
+
+    
+.starting-contdown {
+    margin: 32px auto;
+        color: #181f2a;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    text-shadow: 0 2px 8px rgba(34,46,58,0.08);
+    border: 8px solid #43c6ac;
+    width: max-content;
+    padding: 16px 40px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.85);
+    position: relative;
+    top: 45%;
+}
+.starting-contdown h1 {
+    box-shadow: 0 2px 12px rgba(37,99,235,0.18);
+    font-size: 2.2rem;
+    font-weight: 700;
+        text-shadow: 0 2px 8px rgba(37,99,235,0.22);
+}
+
+    
+.pose-image {
+    width: 350px;
+    max-width: 90vw;
+    border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(34,46,58,0.18);
+    margin: 32px auto;
+        color: #181f2a;
+        text-shadow: 0 2px 8px rgba(34,46,58,0.12);
+    aspect-ratio: 1;
+}
+
+
+    
+.performance-container {
+    text-shadow: 0 2px 8px rgba(67,198,172,0.18);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+        justify-content: center;
+        align-items: flex-start;
+        box-shadow: 0 8px 32px rgba(34,46,58,0.18);
+    position: static;
+}
+
+
+
+    
+.pose-performance {
+    margin: 10px 10px;
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 18px 24px;
+        box-shadow: 0 8px 32px rgba(34,46,58,0.18);
+    min-width: 180px;
+        color: #181f2a;
+        text-shadow: 0 2px 8px rgba(34,46,58,0.18);
+    text-align: center;
+}
+.pose-performance h4 {
+    color: #2563eb;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(37,99,235,0.18);
+}
+
+
+
+#webcam {
+    color: #181f2a;
+    text-shadow: 0 2px 8px rgba(34,46,58,0.18);
+    box-shadow: 0 8px 32px rgba(34,46,58,0.18);
+    transform: rotateY(180deg);
+}
+
+#my-canvas {
+    transform: rotateY(180deg);
+    text-shadow: 0 2px 8px rgba(34,46,58,0.18);
+    box-shadow: 0 8px 32px rgba(34,46,58,0.18);
+}

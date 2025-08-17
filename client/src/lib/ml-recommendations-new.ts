@@ -105,6 +105,13 @@ const routineTemplates: RoutineTemplate[] = [
 ];
 
 export class MLRecommendationEngine {
+  // Utility to shuffle an array
+  private shuffleArray<T>(array: T[]): T[] {
+    return array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+  }
   private timeMapping: { [key: string]: number } = {
     "10-15 min": 15,
     "15-30 min": 30,
@@ -138,7 +145,7 @@ export class MLRecommendationEngine {
     const userAge = this.getAgeFromGroup(input.ageGroup);
     
     // Age compatibility (40% weight)
-    const ageInRange = userAge >= pose.min_age && userAge <= pose.max_age;
+  const ageInRange = userAge >= (pose.min_age ?? 0) && userAge <= (pose.max_age ?? 100);
     score += ageInRange ? 0.4 : 0.1;
     
     if (userAge < 25) {
@@ -187,38 +194,44 @@ export class MLRecommendationEngine {
     preferredCategories?: string[]
   ): YogaPose[] {
     let filteredPoses = poses;
-    
     if (preferredCategories && preferredCategories.length > 0) {
-      filteredPoses = poses.filter(pose => 
-        preferredCategories.includes(pose.goal_category)
-      );
+      filteredPoses = poses.filter(pose => preferredCategories.includes(pose.goal_category));
     }
-    
     const scoredPoses = filteredPoses
       .map(pose => ({
         ...pose,
         score: this.calculatePoseScore(pose, input)
       }))
       .sort((a, b) => (b.score || 0) - (a.score || 0));
-    
+    // Shuffle scored poses to add randomness
+    const shuffledPoses = this.shuffleArray(scoredPoses);
     const selectedPoses: YogaPose[] = [];
+    const usedNames = new Set<string>();
     const usedCategories = new Set<string>();
-    
-    for (const pose of scoredPoses) {
+    for (const pose of shuffledPoses) {
       if (selectedPoses.length >= count) break;
-      
-      if (!usedCategories.has(pose.goal_category) || selectedPoses.length > count * 0.6) {
+      if (
+        pose.name !== undefined &&
+        !usedNames.has(pose.name) &&
+        pose.goal_category !== undefined &&
+        (!usedCategories.has(pose.goal_category) || selectedPoses.length > count * 0.6)
+      ) {
         selectedPoses.push(pose);
+        usedNames.add(pose.name);
         usedCategories.add(pose.goal_category);
       }
     }
-    
-    while (selectedPoses.length < count && selectedPoses.length < scoredPoses.length) {
-      const remainingPoses = scoredPoses.filter(p => !selectedPoses.includes(p));
-      if (remainingPoses.length === 0) break;
-      selectedPoses.push(remainingPoses[0]);
+    // Fill up with remaining unique poses if needed
+    if (selectedPoses.length < count) {
+      const remainingPoses = shuffledPoses.filter(
+        p => p.name !== undefined && !usedNames.has(p.name)
+      );
+      for (const pose of remainingPoses) {
+        if (selectedPoses.length >= count) break;
+        selectedPoses.push(pose);
+        usedNames.add(pose.name!);
+      }
     }
-    
     return selectedPoses;
   }
 
@@ -249,7 +262,7 @@ export class MLRecommendationEngine {
     const goalCategories = new Set(routine.poses.map(p => p.goal_category));
     input.goals.forEach(goal => {
       const mappedCategories = this.goalMapping[goal] || [];
-      if (mappedCategories.some(cat => goalCategories.has(cat))) {
+      if (mappedCategories.some(cat => goalCategories.has(cat as YogaPose['goal_category']))) {
         reasons.push(`Great for ${goal.replace('-', ' ')}`);
       }
     });
@@ -276,12 +289,22 @@ export class MLRecommendationEngine {
     const userAge = this.getAgeFromGroup(input.ageGroup);
     const userDifficultyLevel = input.experience;
     
-    const availablePoses = yogaDataset.filter(pose => {
-      if (userAge < pose.min_age || userAge > pose.max_age) return false;
-      if (userDifficultyLevel === 'beginner' && pose.difficulty === 'advanced') return false;
-      if (userDifficultyLevel === 'intermediate' && pose.difficulty === 'advanced' && Math.random() < 0.7) return false;
+    let availablePoses = yogaDataset.filter(pose => {
+      // Relax age filter: allow +/- 5 years
+      if (userAge < (pose.min_age ?? 0) - 5 || userAge > (pose.max_age ?? 100) + 5) return false;
+      // Relax difficulty filter: allow some advanced for beginners
+      if (userDifficultyLevel === 'beginner' && pose.difficulty === 'advanced') return Math.random() < 0.5 ? false : true;
+      if (userDifficultyLevel === 'intermediate' && pose.difficulty === 'advanced' && Math.random() < 0.5) return false;
       return true;
     });
+
+    // Always return at least 5 top poses if possible
+    if (availablePoses.length < 5) {
+      availablePoses = yogaDataset
+        .map(pose => ({ ...pose, score: this.calculatePoseScore(pose, input) }))
+        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+        .slice(0, 5);
+    }
     
     const recommendations: GeneratedRoutine[] = [];
     
